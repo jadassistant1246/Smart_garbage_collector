@@ -1,0 +1,14 @@
+import mysql.connector
+
+def get_db_connection():
+    try:
+        connection = mysql.connector.connect(
+            host="localhost",  # Or your MySQL server's IP/hostname
+            user="your_mysql_username",
+            password="your_mysql_password",
+            database="mydatabase"
+        )
+        return connection
+    except mysql.connector.Error as err:
+        print(f"Error connecting to MySQL: {err}")
+        return None
