@@ -45,15 +45,16 @@ def login():
         conn = get_db_connection()
         cur = conn.cursor(dictionary=True)
 
-        cur.execute("SELECT * FROM users WHERE email=%s", (email,))
+        cur.execute("SELECT * FROM users WHERE email=%s AND password=%s", (email,password))
         user = cur.fetchone()
 
         cur.close()
         conn.close()
 
-        if user and password(user["password"], password):
-            session["username"] = user["name"]
-            return redirect(url_for("index"))
+        if user :
+            session['user_id'] = user['id']
+            session['username'] = user["username"]
+            return redirect(url_for('index'))
 
         return render_template("login.html", error="Invalid email or password")
 
