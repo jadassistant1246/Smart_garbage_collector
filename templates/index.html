@@ -183,10 +183,38 @@
     <div class="stat-card">
         <h2>0</h2>
         <p>Pending Tasks</p>
+        <div class="section-title">Pending Tasks</div>
+
+{% for task in tasks %}
+<div class="action-card">
+    <div>
+        <div class="label">📍 {{ task.location }}</div>
+        <div class="sub-label">{{ task.description }}</div>
+    </div>
+
+    <form method="POST" action="{{ url_for('accept_task', task_id=task.id) }}">
+        <button class="button">Accept</button>
+    </form>
+</div>
+{% endfor %}
+
     </div>
     <div class="stat-card">
         <h2>0</h2>
         <p>Completed</p>
+        {% for task in tasks %}
+<div class="action-card">
+    <div>
+        <div class="label">{{ task.location }}</div>
+        <div class="sub-label">{{ task.description }}</div>
+    </div>
+
+    <form method="POST" action="{{ url_for('complete_task', task_id=task.id) }}">
+        <button class="button">Task Completed</button>
+    </form>
+</div>
+{% endfor %}
+
     </div>
 </div>
 

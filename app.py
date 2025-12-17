@@ -1,6 +1,5 @@
-from flask import Flask, request, render_template, redirect, url_for, session
-
-import mysql.connector
+from flask import Flask, request, render_template, redirect, url_for, session # type: ignore
+import mysql.connector # type: ignore
 
 app = Flask(__name__)
 app.secret_key = "secret123"
@@ -53,7 +52,7 @@ def login():
 
         if user :
             session['user_id'] = user['id']
-            session['username'] = user["username"]
+            session['name'] = user['name']
             return redirect(url_for('index'))
 
         return render_template("login.html", error="Invalid email or password")
