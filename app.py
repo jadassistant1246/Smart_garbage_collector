@@ -29,6 +29,20 @@ def init_db():
         );
     """)
 
+
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS tasks (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT,
+            description TEXT,
+            location VARCHAR(255),
+            status ENUM('pending','accepted','completed') DEFAULT 'pending',
+            collector_id INT DEFAULT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    """)
+
+
     conn.commit()
     cur.close()
     conn.close()
@@ -99,12 +113,64 @@ def register():
 
     return render_template("register.html")
 
+@app.route("/tasks")
+def tasks():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT * FROM tasks
+        WHERE status = 'pending'
+    """)
+    tasks = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template("tasks.html", tasks=tasks)
+@app.route("/complete_task/<int:task_id>")
+def complete_task(task_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE tasks
+        SET status='completed'
+        WHERE id=%s
+    """, (task_id,))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return redirect(url_for("tasks"))
 
 @app.route("/index")
 def index():
-    if "username" in session:
-        return render_template("index.html", username=session["username"])
-    return redirect(url_for("home"))
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT * FROM tasks
+        WHERE status IN ('pending','accepted')
+    """)
+    tasks = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template(
+        "index.html",
+        username=session["name"],
+        tasks=tasks
+    )
+
 
 
 @app.route("/logout")

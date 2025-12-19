@@ -185,6 +185,24 @@
         <p>Pending Tasks</p>
         <div class="section-title">Pending Tasks</div>
 
+{% for task in tasks %}
+<div class="action-card">
+    <div>
+        <div class="label">{{ task.description }}</div>
+        <div class="sub-label">📍 {{ task.location }}</div>
+    </div>
+
+    {% if task.status == 'pending' %}
+        <a href="{{ url_for('accept_task', task_id=task.id) }}" class="button">Accept</a>
+    {% elif task.status == 'accepted' %}
+        <a href="{{ url_for('complete_task', task_id=task.id) }}" class="button">Complete</a>
+    {% endif %}
+</div>
+{% else %}
+<p style="margin:20px;">No tasks available</p>
+{% endfor %}
+
+
     </div>
     <div class="stat-card">
         <h2>0</h2>
