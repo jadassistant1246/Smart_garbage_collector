@@ -29,8 +29,7 @@ def init_db():
         );
     """)
 
-
-        cur.execute("""
+    cur.execute("""
         CREATE TABLE IF NOT EXISTS tasks (
             id INT AUTO_INCREMENT PRIMARY KEY,
             user_id INT,
@@ -111,7 +110,7 @@ def register():
         session["username"] = name
         return redirect(url_for("index"))
 
-    return render_template("register.html")
+    return render_template('register.html')
 
 @app.route("/tasks")
 def tasks():
