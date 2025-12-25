@@ -175,6 +175,42 @@ def complete_task(task_id):
 
     return redirect(url_for("tasks"))
 
+@app.route("/profile")
+def profile():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    collector_id = session["user_id"]
+
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT name, phone, email, vehicle_no, area
+        FROM collectors
+        WHERE id = %s
+    """, (collector_id,))
+    collector = cur.fetchone()
+
+    cur.execute("""
+        SELECT
+            SUM(status='accepted') AS total_collected,
+            SUM(status='pending') AS pending_tasks,
+            SUM(status='completed') AS completed_tasks
+        FROM tasks
+        WHERE collector_id = %s
+    """, (collector_id,))
+    stats = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    return render_template(
+        "profile.html",
+        collector=collector,
+        stats=stats
+    )
+
 @app.route("/index")
 def index():
     if "user_id" not in session:
