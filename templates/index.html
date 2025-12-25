@@ -118,12 +118,12 @@
     }
 
     .label {
-        font-size: 16px;
+        font-size: 25px;
         font-weight: bold;
     }
 
     .sub-label {
-        font-size: 13px;
+        font-size: 16px;
         color: #777;
     }
 
@@ -157,7 +157,7 @@
 
     .nav-item {
         text-align: center;
-        font-size: 12px;
+        font-size: 22px;
         color: #777;
     }
 
@@ -177,12 +177,11 @@
 <!-- Stats -->
 <div class="stats-container">
     <div class="stat-card">
-        <h2>0</h2>
+       <h2>{{ accepted_count }}</h2>
         <p>Total Collected</p>
     </div>
     <div class="stat-card">
-        <h2>0</h2>
-        <p>Pending Tasks</p>
+        <h2>{{ pending_count }}</h2>
         <div class="section-title">Pending Tasks</div>
 
 {% for task in tasks %}
@@ -203,40 +202,9 @@
 {% else %}
 <p style="margin:20px;">No tasks available</p>
 {% endfor %}
-
-{% for task in tasks %}
-<div class="card">
-
-    <img src="https://via.placeholder.com/600x250" class="task-img">
-
-    <div class="card-body">
-
-        <span class="status">PENDING</span>
-
-        <h3 class="name">{{ task.description }}</h3>
-
-        <p class="info">📍 {{ task.location }}</p>
-        <p class="info">⏰ {{ task.created_at }}</p>
-
-        <div class="btn-row">
-            <button class="nav-btn">🧭 Navigate</button>
-            <button class="call-btn">📞 Call</button>
-        </div>
-
-        <form action="{{ url_for('accept_task', task_id=task.id) }}" method="POST">
-            <button type="submit" class="accept-btn">✔ Accept Task</button>
-        </form>
-
-    </div>
-</div>
-{% else %}
-<p style="text-align:center;">No pending tasks</p>
-{% endfor %}
-
-
     </div>
     <div class="stat-card">
-        <h2>0</h2>
+       <h2>{{ completed_count }}</h2>
         <p>Completed</p>
 
     </div>
@@ -245,13 +213,15 @@
 <div class="section-title">Quick Actions</div>
 
 <!-- View Tasks -->
-<div class="action-card">
-    <div>
-        <div class="label">View Tasks</div>
-        <div class="sub-label">See all pending garbage reports</div>
+<a href="{{ url_for('tasks') }}" style="text-decoration:none;">
+    <div class="action-card">
+        <div>
+            <div class="label">View Tasks</div>
+            <div class="sub-label">See all pending garbage reports</div>
+        </div>
     </div>
-    
-</div>
+</a>
+
 
 <!-- Map View -->
 <div class="action-card">

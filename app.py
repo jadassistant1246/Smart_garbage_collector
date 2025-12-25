@@ -157,6 +157,7 @@ def accept_task(task_id):
 
     return redirect(url_for("index"))
 
+
 @app.route("/complete_task/<int:task_id>")
 def complete_task(task_id):
     conn = get_db_connection()
@@ -184,13 +185,33 @@ def index():
     conn = get_db_connection()
     cur = conn.cursor(dictionary=True)
 
+    # 1️Pending tasks (NOT accepted by anyone)
     cur.execute("""
         SELECT * FROM tasks
-        WHERE collector_id = %s
-          AND status IN ('accepted','pending')
-    """, (collector_id,))
+        WHERE status = 'pending'
+    """)
+    pending_tasks = cur.fetchall()
 
-    tasks = cur.fetchall()
+    # 2️My accepted tasks
+    cur.execute("""
+        SELECT * FROM tasks
+        WHERE collector_id = %s AND status = 'accepted'
+    """, (collector_id,))
+    my_tasks = cur.fetchall()
+
+    # 3️ Completed tasks count
+    cur.execute("""
+        SELECT COUNT(*) AS completed_count
+        FROM tasks
+        WHERE collector_id = %s AND status = 'completed'
+    """, (collector_id,))
+    completed = cur.fetchone()["completed_count"]
+
+    # 4 Pending count
+    pending_count = len(pending_tasks)
+
+    # 5Accepted count
+    accepted_count = len(my_tasks)
 
     cur.close()
     conn.close()
@@ -198,8 +219,13 @@ def index():
     return render_template(
         "index.html",
         username=session["name"],
-        tasks=tasks
+        pending_tasks=pending_tasks,
+        my_tasks=my_tasks,
+        pending_count=pending_count,
+        accepted_count=accepted_count,
+        completed_count=completed
     )
+
 
 
 

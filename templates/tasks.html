@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
+{% block body%}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,11 +13,13 @@
 /* HEADER */
 .header {
     background: #ff6f2f;
-    padding: 15px;
+    padding: 25px;
     color: white;
     font-size: 22px;
     text-align: left;
     font-weight: bold;
+    border-bottom-left-radius: 25px;
+        border-bottom-right-radius: 25px;
 }
 
 /* TABS */
@@ -194,4 +196,4 @@
     </div>
 
 </body>
-</html>
+{% endblock %}
