@@ -165,7 +165,7 @@
     <!-- TASK CARD -->
     <div class="card">
 
-        <img src="C:\MiniProject\Flaskapp\Smart_garbage_collector\templates\static\garbage.jpg" class="task-img">
+        <img src="{{ url_for('static', filename='uploads/' + task.image) }}" class="task-img">
 
         <div class="card-body">
 
