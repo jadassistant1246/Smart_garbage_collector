@@ -282,29 +282,38 @@ input:focus {
       </nav>
     <main>
         <div class="login-form">
-            <form action="">
-                <h1>Welcome back</h1>
-                <p>Collector Login in to Waste Mangament</p>
-                <form action="{{url_for('login')}}" method="post" class="login-form">
-                    <div class="form-group">
-                        <span class="input-icon"><i class="fa-solid fa-user"></i></span>
-                        <input type="email" placeholder="Email" required>
-                    </div>
-                    <div class="form-group">
-                        <span class="input-icon"><i class="fa-solid fa-lock"></i></span>
-                        <input type="password" placeholder="Password"  required >
-                    </div>
-                    <button type="submit" class="login-button" onclick="window.location.href='\index'">Login</button>
 
-                </form>
-                <p>Don't have an account?<a href="\register" > Sign Up</a></p>
+    <!-- SINGLE FORM -->
+    <form action="{{ url_for('login') }}" method="POST">
 
-                <h5>Quick accounts</h5>
-                <div class="accounts">
-                    <button type="button" class="account-button"><i class="fa-solid fa-user-shield"></i> Admin</button>
-                    <button type="button" class="account-button"><i class="fa-solid fa-recycle"></i> Collector</button>
-                    <button type="button" class="account-button"><i class="fa-solid fa-user"></i> User</button>
-                </div>
+        <h1>Welcome back</h1>
+        <p>Collector Login to Waste Management</p>
+
+        {% if error %}
+            <p style="color:red;">{{ error }}</p>
+        {% endif %}
+
+        <div class="form-group">
+            <input type="email"
+                   name="email"
+                   placeholder="Email"
+                   required>
+        </div>
+
+        <div class="form-group">
+            <input type="password"
+                   name="password"
+                   placeholder="Password"
+                   required>
+        </div>
+
+        <!-- NO onclick -->
+        <button type="submit" class="login-button">Login</button>
+        <p>Don't have an account?
+             <a href="/register">Sign Up</a>
+          </p>
+
+          </div>
 
             </form>
         </div>

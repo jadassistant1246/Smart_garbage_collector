@@ -1,6 +1,5 @@
-from flask import Flask, request, render_template, redirect, url_for, session
-
-import mysql.connector
+from flask import Flask, request, render_template, redirect, url_for, session # type: ignore
+import mysql.connector # type: ignore
 
 app = Flask(__name__)
 app.secret_key = "secret123"
@@ -30,6 +29,19 @@ def init_db():
         );
     """)
 
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS tasks (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT,
+            description TEXT,
+            location VARCHAR(255),
+            status ENUM('pending','accepted','completed') DEFAULT 'pending',
+            collector_id INT DEFAULT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    """)
+
+
     conn.commit()
     cur.close()
     conn.close()
@@ -45,15 +57,16 @@ def login():
         conn = get_db_connection()
         cur = conn.cursor(dictionary=True)
 
-        cur.execute("SELECT * FROM users WHERE email=%s", (email,))
+        cur.execute("SELECT * FROM users WHERE email=%s AND password=%s", (email,password))
         user = cur.fetchone()
 
         cur.close()
         conn.close()
 
-        if user and password(user["password"], password):
-            session["username"] = user["name"]
-            return redirect(url_for("index"))
+        if user :
+            session['user_id'] = user['id']
+            session['name'] = user['name']
+            return redirect(url_for('index'))
 
         return render_template("login.html", error="Invalid email or password")
 
@@ -97,14 +110,123 @@ def register():
         session["username"] = name
         return redirect(url_for("index"))
 
-    return render_template("register.html")
+    return render_template('register.html')
 
+@app.route("/tasks")
+def tasks():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT * FROM tasks
+        WHERE status = 'pending'
+          AND collector_id IS NULL
+    """)
+    tasks = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template("tasks.html", tasks=tasks)
+
+@app.route("/accept_task/<int:task_id>", methods=["POST"])
+def accept_task(task_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    collector_id = session["user_id"]
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE tasks
+        SET status = 'accepted',
+            collector_id = %s
+        WHERE id = %s
+          AND status = 'pending'
+          AND collector_id IS NULL
+    """, (collector_id, task_id))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return redirect(url_for("index"))
+
+
+@app.route("/complete_task/<int:task_id>")
+def complete_task(task_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE tasks
+        SET status='completed'
+        WHERE id=%s
+    """, (task_id,))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return redirect(url_for("tasks"))
 
 @app.route("/index")
 def index():
-    if "username" in session:
-        return render_template("index.html", username=session["username"])
-    return redirect(url_for("home"))
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    collector_id = session["user_id"]
+
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+
+    # 1️Pending tasks (NOT accepted by anyone)
+    cur.execute("""
+        SELECT * FROM tasks
+        WHERE status = 'pending'
+    """)
+    pending_tasks = cur.fetchall()
+
+    # 2️My accepted tasks
+    cur.execute("""
+        SELECT * FROM tasks
+        WHERE collector_id = %s AND status = 'accepted'
+    """, (collector_id,))
+    my_tasks = cur.fetchall()
+
+    # 3️ Completed tasks count
+    cur.execute("""
+        SELECT COUNT(*) AS completed_count
+        FROM tasks
+        WHERE collector_id = %s AND status = 'completed'
+    """, (collector_id,))
+    completed = cur.fetchone()["completed_count"]
+
+    # 4 Pending count
+    pending_count = len(pending_tasks)
+
+    # 5Accepted count
+    accepted_count = len(my_tasks)
+
+    cur.close()
+    conn.close()
+
+    return render_template(
+        "index.html",
+        username=session["name"],
+        pending_tasks=pending_tasks,
+        my_tasks=my_tasks,
+        pending_count=pending_count,
+        accepted_count=accepted_count,
+        completed_count=completed
+    )
+
+
 
 
 @app.route("/logout")
