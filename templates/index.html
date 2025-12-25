@@ -193,13 +193,44 @@
     </div>
 
     {% if task.status == 'pending' %}
-        <a href="{{ url_for('accept_task', task_id=task.id) }}" class="button">Accept</a>
+        <form action="{{ url_for('accept_task', task_id=task.id) }}" method="POST">
+    <button class="button">Accept</button>
+         </form>
     {% elif task.status == 'accepted' %}
         <a href="{{ url_for('complete_task', task_id=task.id) }}" class="button">Complete</a>
     {% endif %}
 </div>
 {% else %}
 <p style="margin:20px;">No tasks available</p>
+{% endfor %}
+
+{% for task in tasks %}
+<div class="card">
+
+    <img src="https://via.placeholder.com/600x250" class="task-img">
+
+    <div class="card-body">
+
+        <span class="status">PENDING</span>
+
+        <h3 class="name">{{ task.description }}</h3>
+
+        <p class="info">📍 {{ task.location }}</p>
+        <p class="info">⏰ {{ task.created_at }}</p>
+
+        <div class="btn-row">
+            <button class="nav-btn">🧭 Navigate</button>
+            <button class="call-btn">📞 Call</button>
+        </div>
+
+        <form action="{{ url_for('accept_task', task_id=task.id) }}" method="POST">
+            <button type="submit" class="accept-btn">✔ Accept Task</button>
+        </form>
+
+    </div>
+</div>
+{% else %}
+<p style="text-align:center;">No pending tasks</p>
 {% endfor %}
 
 

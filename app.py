@@ -123,6 +123,7 @@ def tasks():
     cur.execute("""
         SELECT * FROM tasks
         WHERE status = 'pending'
+          AND collector_id IS NULL
     """)
     tasks = cur.fetchall()
 
@@ -130,6 +131,32 @@ def tasks():
     conn.close()
 
     return render_template("tasks.html", tasks=tasks)
+
+@app.route("/accept_task/<int:task_id>", methods=["POST"])
+def accept_task(task_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    collector_id = session["user_id"]
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE tasks
+        SET status = 'accepted',
+            collector_id = %s
+        WHERE id = %s
+          AND status = 'pending'
+          AND collector_id IS NULL
+    """, (collector_id, task_id))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return redirect(url_for("index"))
+
 @app.route("/complete_task/<int:task_id>")
 def complete_task(task_id):
     conn = get_db_connection()
@@ -152,13 +179,17 @@ def index():
     if "user_id" not in session:
         return redirect(url_for("login"))
 
+    collector_id = session["user_id"]
+
     conn = get_db_connection()
     cur = conn.cursor(dictionary=True)
 
     cur.execute("""
         SELECT * FROM tasks
-        WHERE status IN ('pending','accepted')
-    """)
+        WHERE collector_id = %s
+          AND status IN ('accepted','pending')
+    """, (collector_id,))
+
     tasks = cur.fetchall()
 
     cur.close()

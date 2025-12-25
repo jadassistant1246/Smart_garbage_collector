@@ -121,29 +121,29 @@
     font-weight: bold;
 }
 
-/* BOTTOM NAV */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: white;
-    display: flex;
-    border-top: 1px solid #ddd;
-}
+ /* Bottom Navigation */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background: white;
+        padding: 10px 0;
+        box-shadow: 0 -1px 5px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-around;
+    }
 
-.nav-item {
-    flex: 1;
-    text-align: center;
-    padding: 10px;
-    color: #999;
-    font-size: 14px;
-}
+    .nav-item {
+        text-align: center;
+        font-size: 12px;
+        color: #777;
+    }
 
-.nav-item.active {
-    color: #ff6f2f;
-    font-weight: bold;
-}</style>
+    .nav-item-active {
+        color: #15bc52;
+        font-weight: bold;
+    }
+</style>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -187,10 +187,10 @@
 
     <!-- BOTTOM NAVBAR -->
     <div class="bottom-nav">
-        <div class="nav-item"><a href="Collector.html">Home</a></div>
-        <div class="nav-item"><a href="tasks.html">Tasks</a></div>
-        <div class="nav-item active"><a href="map.html">Map</a></div>
-        <div class="nav-item"><a href="profile.html">Profile</a></div>
+        <div class="nav-item"><a href="\index">Home</a></div>
+        <div class="nav-item"><a href="\tasks">Tasks</a></div>
+        <div class="nav-item active"><a href="\map">Map</a></div>
+        <div class="nav-item"><a href="\profile">Profile</a></div>
     </div>
 
 </body>
