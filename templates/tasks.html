@@ -137,7 +137,7 @@
 
     .nav-item {
         text-align: center;
-        font-size: 12px;
+        font-size: 22px;
         color: #777;
     }
 
@@ -156,44 +156,68 @@
     </header>
 
     <!-- TAB BAR -->
-    <div class="tabs">
-        <div class="tab active">Pending</div>
-        <div class="tab">My Tasks</div>
-        <div class="tab">Collected</div>
-    </div>
+   <div class="tabs">
+    <a href="{{ url_for('tasks', tab='pending') }}"
+       class="tab {% if active_tab == 'pending' %}active{% endif %}">
+        Pending
+    </a>
+
+    <a href="{{ url_for('tasks', tab='mytasks') }}"
+       class="tab {% if active_tab == 'mytasks' %}active{% endif %}">
+        My Tasks
+    </a>
+
+    <a href="{{ url_for('tasks', tab='collected') }}"
+       class="tab {% if active_tab == 'collected' %}active{% endif %}">
+        Collected
+    </a>
+</div>
+
 
     <!-- TASK CARD -->
-    <div class="card">
 
-        <img src="https://via.placeholder.com/600x250" class="task-img">
+ {% for task in tasks %}
+<div class="card">
+    <div class="card-body">
+        <span class="status">{{ task.status|upper }}</span>
+        <h3 class="name">{{ task.name }}</h3>
+        <p class="info">📞 {{ task.phone }}</p>
+        <p class="info">📍 {{ task.location }}</p>
+        <p class="info">⏰ {{ task.created_at }}</p>
 
-        <div class="card-body">
-
-            <span class="status">PENDING</span>
-
-            <h3 class="name">Sampada</h3>
-
-            <p class="info">📞 9999999999</p>
-            <p class="info">📍 37.421998, -122.084000</p>
-            <p class="info">⏰ 11/15/2025, 10:47:54 PM</p>
-
-            <div class="btn-row">
-                <button class="nav-btn">🧭 Navigate</button>
-                <button class="call-btn">📞 Call</button>
-            </div>
-
-            <button class="accept-btn">✔ Accept Task</button>
-
+        <div class="btn-row">
+            <button class="nav-btn">🧭 Navigate</button>
+            <button class="call-btn">📞 Call</button>
         </div>
+
+        {% if task.status == 'pending' %}
+            <form method="POST" action="{{ url_for('accept_task', task_id=task.id) }}">
+                <button class="accept-btn">✔ Accept Task</button>
+            </form>
+        {% elif active_tab == 'mytasks' %}
+            <form method="POST" action="{{ url_for('complete_task', task_id=task.id) }}">
+                <button class="accept-btn">✔ Mark as Collected</button>
+            </form>
+        {% endif %}
     </div>
+</div>
+{% else %}
+<p style="text-align:center;margin-top:20px;">No tasks found</p>
+{% endfor %}
+
+
+    
+    
 
     <!-- BOTTOM NAVBAR -->
-    <div class="bottom-nav">
+   <div class="bottom-nav">
         <div class="nav-item"><a href="\index">Home</a></div>
-        <div class="nav-item"><a href="\tasks">Tasks</a></div>
-        <div class="nav-item active"><a href="\map">Map</a></div>
+        <div class="nav-item"><a href="\tasks">My_Tasks</a></div>
+        <div class="nav-item"><a href="\collected">Collected</a></div>
         <div class="nav-item"><a href="\profile">Profile</a></div>
     </div>
 
 </body>
+
+
 {% endblock %}
